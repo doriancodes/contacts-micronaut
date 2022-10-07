@@ -1,0 +1,29 @@
+micronaut:
+  application:
+    name: contactsMicronaut
+  router:
+    static-resources:
+      swagger:
+        paths: classpath:META-INF/swagger
+        mapping: /swagger/**
+      swagger-ui:
+        paths: classpath:swagger/views/swagger-ui
+netty:
+  default:
+    allocator:
+      max-order: 3
+datasources:
+  defult:
+    url: jdbc:postgresql://${DATABASE_HOST:localhost}:${DATABASE_PORT:5432}/${DATABASE_DB:postgres}
+    driverClassName: org.postgresql.Driver
+    username: ${DATABASE_USER:postgres}
+    password: ${DATABASE_PASSWORD:postgres}
+    schema-generate: CREATE
+    dialect: POSTGRES
+    minimum-idle: 5
+    maximum-pool-size: 20
+    connection-timeout: 60000
+flyway:
+  datasources:
+    default:
+      enabled: true
