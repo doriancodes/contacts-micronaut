@@ -1,7 +1,5 @@
 package dorian.codes
 
-import io.micronaut.http.HttpResponse
-import io.micronaut.http.MutableHttpResponse
 import io.micronaut.http.annotation.*
 import io.micronaut.serde.annotation.Serdeable
 import io.micronaut.validation.Validated
@@ -13,12 +11,6 @@ import reactor.core.publisher.Mono
 @Controller("/contacts")
 @Validated
 class ContactsController(val contactRepository: ContactRepository) {
-
-    /**
-    @Get("/hello")
-    fun greeting(): Mono<HttpResponse<*>> {
-        return Mono.just(HttpResponse.ok("Hello"))
-    }**/
 
     @Get("/{id}")
     fun getContact(@PathVariable id: Long): Mono<APIContact> {
@@ -40,9 +32,17 @@ class ContactsController(val contactRepository: ContactRepository) {
 
     @Put("/{id}")
     fun updateContact(@PathVariable id: Long, @Body apiContact: APIContact): Mono<APIContact> {
-        val contactToUpdate = apiContact.toContact().copy(id = id)
-        val updatedContact = contactRepository.update(contactToUpdate)
-        return updatedContact.map { it.toAPIContact() }
+        return contactRepository.findById(id).flatMap {
+            val contactToUpdate = apiContact.toContact().copy(id = id)
+            contactRepository.update(contactToUpdate).map { it.toAPIContact() }
+        }
+    }
+
+    @Delete("/{id}")
+    fun deleteContact(@PathVariable id: Long): Mono<Long> {
+        return contactRepository.findById(id).flatMap {
+            contactRepository.delete(it)
+        }
     }
 }
 
@@ -58,9 +58,4 @@ data class APIContact(
     val lastName: String,
     val email: String,
     val phone: String?
-)
-
-@Serdeable
-data class NotFoundResponse(
-    val message: String
 )

@@ -1,9 +1,7 @@
 package dorian.codes
 
-import io.micronaut.data.jdbc.annotation.JdbcRepository
 import io.micronaut.data.model.query.builder.sql.Dialect
 import io.micronaut.data.r2dbc.annotation.R2dbcRepository
-import io.micronaut.data.repository.CrudRepository
 import io.micronaut.data.repository.reactive.ReactiveStreamsCrudRepository
 import org.reactivestreams.Publisher
 import reactor.core.publisher.Flux
@@ -16,4 +14,5 @@ interface ContactRepository: ReactiveStreamsCrudRepository<Contact, Long> {
     override fun findAll(): Flux<Contact>
     override fun <S : Contact?> save(entity: S): Mono<S>
     override fun <S : Contact?> update(entity: S): Mono<S>
+    override fun delete(entity: Contact): Mono<Long>
 }
