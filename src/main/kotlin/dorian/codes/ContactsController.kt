@@ -1,10 +1,13 @@
 package dorian.codes
 
 import io.micronaut.http.HttpResponse
+import io.micronaut.http.MutableHttpResponse
 import io.micronaut.http.annotation.*
 import io.micronaut.serde.annotation.Serdeable
 import io.micronaut.validation.Validated
 import jakarta.inject.Singleton
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
 
 @Singleton
 @Controller("/contacts")
@@ -18,30 +21,28 @@ class ContactsController(val contactRepository: ContactRepository) {
     }**/
 
     @Get("/{id}")
-    fun getContact(@PathVariable id: Long): HttpResponse<*> {
+    fun getContact(@PathVariable id: Long): Mono<APIContact> {
         val contact = contactRepository.findById(id)
-        if (contact.isPresent) return HttpResponse.ok(contact.get().toAPIContact())
-        return HttpResponse.notFound(NotFoundResponse("Contact $id not found."))
+        return contact.map { it.toAPIContact() }
     }
 
     @Get()
-    fun getAllContacts(): HttpResponse<*> {
-        val contacts = contactRepository.findAll().toList()
-        if (contacts.isEmpty()) return HttpResponse.ok(NotFoundResponse("No contacts found."))
-        return HttpResponse.ok(contacts.map { contact -> contact.toAPIContact() })
+    fun getAllContacts(): Flux<APIContact> {
+        val contacts = contactRepository.findAll()
+        return contacts.map { it.toAPIContact() }
     }
 
     @Post("/add")
-    fun addContact(@Body apiContact: APIContact): HttpResponse<APIContact> {
-        contactRepository.save(apiContact.toContact())
-        return HttpResponse.created(apiContact)
+    fun addContact(@Body apiContact: APIContact): Mono<APIContact> {
+        val newContact = contactRepository.save(apiContact.toContact())
+        return newContact.map { it.toAPIContact() }
     }
 
     @Put("/{id}")
-    fun updateContact(@PathVariable id: Long, @Body apiContact: APIContact): HttpResponse<APIContact> {
+    fun updateContact(@PathVariable id: Long, @Body apiContact: APIContact): Mono<APIContact> {
         val contactToUpdate = apiContact.toContact().copy(id = id)
-        contactRepository.update(contactToUpdate)
-        return HttpResponse.ok(contactToUpdate.toAPIContact())
+        val updatedContact = contactRepository.update(contactToUpdate)
+        return updatedContact.map { it.toAPIContact() }
     }
 }
 

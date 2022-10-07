@@ -27,3 +27,9 @@ flyway:
   datasources:
     default:
       enabled: true
+r2dbc:
+  datasources:
+    default:
+      url: r2dbc:postgresql://${DATABASE_HOST:localhost}:${DATABASE_PORT:5432}/${DATABASE_DB:postgres}
+      username: ${DATABASE_USER:postgres}
+      password: ${DATABASE_PASSWORD:postgres}

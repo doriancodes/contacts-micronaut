@@ -41,6 +41,13 @@ dependencies {
     annotationProcessor("io.micronaut.openapi:micronaut-openapi:4.5.2")
     implementation("io.swagger.core.v3:swagger-annotations")
 
+    // https://mvnrepository.com/artifact/io.r2dbc/r2dbc-postgresql
+    implementation("io.r2dbc:r2dbc-postgresql:0.8.13.RELEASE")
+    runtimeOnly("org.postgresql:r2dbc-postgresql")
+    implementation("io.micronaut.data:micronaut-data-r2dbc")
+
+
+
 }
 
 
